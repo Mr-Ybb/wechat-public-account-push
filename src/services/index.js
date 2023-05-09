@@ -482,6 +482,8 @@ export const getBirthdayMessage = (festivals) => {
   })
   let resMessage = ''
 
+  const wechatTestBirthdayMessage = []
+
   birthdayList.forEach((item, index) => {
     if (
       !config.FESTIVALS_LIMIT
@@ -500,29 +502,34 @@ export const getBirthdayMessage = (festivals) => {
         }
 
         if (item.diffDay === 0) {
-          message = `今天是 ${item.name} 的${age && item.isShowAge ? `${(item.useLunar ? 1 : 0) + age}岁` : ''}生日哦，祝${item.name}生日快乐！`
+          message = `今天是 「${item.name}」 的${age && item.isShowAge ? `${(item.useLunar ? 1 : 0) + age}岁` : ''}${item.useLunar ? '阴历' : '公历'}生日哦，祝${item.name}生日快乐！`
         } else {
-          message = `距离 ${item.name} 的${age && item.isShowAge ? `${age + 1}岁` : ''}生日还有${item.diffDay}天`
+          message = `距离 「${item.name}」 的${age && item.isShowAge ? `${age + 1}岁` : ''}${item.useLunar ? '阴历' : '公历'}生日还有${item.diffDay}天`
         }
       }
 
       // 节日相关
       if (item.type === '节日') {
         if (item.diffDay === 0) {
-          message = `今天是 ${item.name} 哦，要开心！`
+          message = `今天是 「${item.name}」 哦，要开心！`
         } else {
-          message = `距离 ${item.name} 还有${item.diffDay}天`
+          message = `距离 「${item.name}」 还有${item.diffDay}天`
         }
       }
 
       // 存储数据
       if (message) {
         resMessage += `${message} ${getLB()}`
+        wechatTestBirthdayMessage.push({
+          name: toLowerLine(`wxBirthday_${index}`),
+          value: message,
+          color: getColor()
+        })
       }
     }
   })
 
-  return resMessage
+  return {resMessage, wechatTestBirthdayMessage}
 }
 
 /**
@@ -699,7 +706,7 @@ export const getAggregatedData = async () => {
     }))
 
     // 获取生日/生日信息
-    const birthdayMessage = getBirthdayMessage(user.festivals)
+    const { resMessage: birthdayMessage, wechatTestBirthdayMessage } = getBirthdayMessage(user.festivals)
 
     // 获取星座运势
     const constellationFortune = await getConstellationFortune(user.horoscopeDate, user.horoscopeDateType)
@@ -1006,9 +1013,11 @@ export const sendMessage = async (templateId, user, params, usePassage) => {
   const wxTemplateData = {}
   if (Object.prototype.toString.call(params) === '[object Array]') {
     params.forEach((item) => {
-      wxTemplateData[item.name] = {
-        value: item.value,
-        color: item.color,
+      if (item && item.name) {
+        wxTemplateData[item.name] = {
+          value: item.value,
+          color: item.color,
+        }
       }
     })
   }

@@ -41,12 +41,10 @@
 天秤座运势：{{comprehensive_horoscope.DATA}}
 今天是我们恋爱的第{{love_day.DATA}}天
 
-{{birthday_message.DATA}}
-
-{{one_talk.DATA}} -- {{talk_from.DATA}}
-
-{{note_en.DATA}} 
-{{note_ch.DATA}}
+提醒：
+提醒：{{wx_birthday_0.DATA}} 
+提醒：{{wx_birthday_1.DATA}} 
+提醒：{{wx_birthday_2.DATA}} 
 ```
 
 模板标题: `推送完成提醒`
